@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#08131f" />
+    <meta name="description" content="A 16-channel MIDI setup editor for the Yamaha PSR-E583." />
+    <title>PSR-E583 Channel Lab</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23081420'/%3E%3Cpath d='M12 14h40v36H12z' fill='%23f5f7fa'/%3E%3Cpath d='M20 14v22h7V14m10 0v22h7V14' fill='%23081420'/%3E%3Cpath d='M12 44h40' stroke='%231ca6ff' stroke-width='5'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="voices.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand" aria-label="PSR-E583 Channel Lab">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <span><strong>PSR-E583</strong><small>CHANNEL LAB</small></span>
+      </div>
+      <div class="connection">
+        <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+        <span id="midiStatus">MIDI not connected</span>
+        <select id="outputSelect" aria-label="MIDI output" disabled>
+          <option>Select an output</option>
+        </select>
+        <button class="primary" id="connectButton" type="button">Connect MIDI</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="session-bar" aria-label="Setup controls">
+        <div class="session-name">
+          <label for="setupName">SETUP</label>
+          <input id="setupName" value="New Performance" maxlength="48" />
+        </div>
+        <div class="session-actions">
+          <button id="sendAllButton" type="button">Send all 16</button>
+          <button id="saveButton" type="button">Save</button>
+          <button id="libraryButton" type="button">Setups <span id="setupCount">0</span></button>
+          <button id="exportButton" type="button">Export</button>
+          <button id="importButton" type="button">Import</button>
+          <button class="danger" id="panicButton" type="button">Panic</button>
+          <input type="file" id="importFile" accept="application/json" hidden />
+        </div>
+      </section>
+
+      <section class="info-strip" aria-label="Editor status">
+        <p><strong>16-part mixer</strong> <span>Choose a voice, shape its MIDI controls, then send it to the keyboard.</span></p>
+        <p id="activity" role="status" aria-live="polite">Ready — connect a MIDI output when you want to transmit.</p>
+      </section>
+
+      <section id="channelGrid" class="channel-grid" aria-label="MIDI channels"></section>
+    </main>
+
+    <dialog id="voiceDialog" class="voice-dialog">
+      <form method="dialog" class="dialog-shell">
+        <header>
+          <div>
+            <span class="eyebrow" id="voiceDialogChannel">CHANNEL 1</span>
+            <h2>Choose a voice</h2>
+          </div>
+          <button class="icon-button" value="cancel" aria-label="Close voice browser" type="submit">×</button>
+        </header>
+        <div class="voice-tools">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="voiceSearch" type="search" placeholder="Search 791 MIDI-selectable voices" autocomplete="off" />
+          </label>
+          <select id="voiceFamily" aria-label="Voice family">
+            <option value="all">All families</option>
+          </select>
+        </div>
+        <div class="voice-table-head" aria-hidden="true"><span>VOICE</span><span>BANK</span><span>PROGRAM</span></div>
+        <div id="voiceResults" class="voice-results" role="listbox" aria-label="Yamaha voices"></div>
+        <footer><span id="voiceResultCount"></span><span>From the supplied Yamaha PSR-E583 Data List</span></footer>
+      </form>
+    </dialog>
+
+    <dialog id="setupDialog" class="setup-dialog">
+      <form method="dialog" class="dialog-shell">
+        <header>
+          <div><span class="eyebrow">LOCAL LIBRARY</span><h2>Saved setups</h2></div>
+          <button class="icon-button" value="cancel" aria-label="Close setup library" type="submit">×</button>
+        </header>
+        <div id="setupList" class="setup-list"></div>
+      </form>
+    </dialog>
+
+    <template id="channelTemplate">
+      <article class="channel-card">
+        <header class="channel-head">
+          <div><span class="channel-number"></span><span class="channel-role">MIDI PART</span></div>
+          <button class="mute-button" type="button" aria-pressed="false">MUTE</button>
+        </header>
+        <button class="patch-button" type="button">
+          <span class="patch-label">VOICE</span>
+          <strong class="patch-name"></strong>
+          <span class="patch-meta"></span>
+        </button>
+        <div class="control-stack"></div>
+        <details>
+          <summary>MIDI details</summary>
+          <div class="midi-fields">
+            <label>Bank MSB<input class="msb-input" type="number" min="0" max="127" /></label>
+            <label>Bank LSB<input class="lsb-input" type="number" min="0" max="127" /></label>
+            <label>Program<input class="program-input" type="number" min="1" max="128" /></label>
+          </div>
+        </details>
+        <footer>
+          <button class="test-button" type="button">Test note</button>
+          <button class="send-button" type="button">Send channel</button>
+        </footer>
+      </article>
+    </template>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
